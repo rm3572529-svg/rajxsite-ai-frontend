@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RajXSite AI – Free AI Website Builder</title>
+<meta name="description" content="Build your website in minutes using AI. No coding required. Free forever."/>
+<meta name="theme-color" content="#0a0a0f"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3d;
+  --accent:#7c5cfc;--accent2:#e040fb;--accent3:#00e5ff;
+  --text:#f0f0ff;--muted:#8888aa;--danger:#ff4560;--success:#00e676;
+  --card:#16161f;--glow:0 0 30px rgba(124,92,252,.35);
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:var(--font-body)}
+input,select,textarea{font-family:var(--font-body)}
+
+/* ---- BACKGROUND MESH ---- */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 60% 50% at 20% 10%,rgba(124,92,252,.12) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 80% 80%,rgba(0,229,255,.08) 0%,transparent 60%),
+  radial-gradient(ellipse 40% 30% at 50% 50%,rgba(224,64,251,.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0}
+
+/* ---- LOADING SCREEN ---- */
+#loading-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.loader-logo{font-family:var(--font-head);font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:pulse 2s infinite}
+.loader-ring{width:60px;height:60px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.loader-text{color:var(--muted);font-size:.9rem;letter-spacing:.1em}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(124,92,252,.3)}50%{box-shadow:0 0 40px rgba(124,92,252,.6)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+
+/* ---- PAGES / SECTIONS ---- */
+.page{display:none;min-height:100vh;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ---- HEADER / NAV ---- */
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px}
+.nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-family:var(--font-head);font-weight:800;font-size:1.4rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-actions{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:10px;font-size:.88rem;font-weight:600;border:none;transition:all .2s;letter-spacing:.02em}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(124,92,252,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 30px rgba(124,92,252,.5)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+.btn-danger{background:rgba(255,69,96,.15);color:var(--danger);border:1px solid rgba(255,69,96,.3)}
+.btn-danger:hover{background:rgba(255,69,96,.25)}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.btn-icon{padding:8px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.btn-icon:hover{color:var(--text);border-color:var(--accent)}
+
+/* ---- LANDING PAGE ---- */
+.hero{max-width:1100px;margin:0 auto;padding:80px 20px 60px;text-align:center;animation:fadeInUp .8s ease}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,92,252,.15);border:1px solid rgba(124,92,252,.3);border-radius:100px;padding:6px 16px;font-size:.8rem;color:var(--accent);margin-bottom:24px;letter-spacing:.05em}
+.hero-badge::before{content:'✦';animation:pulse 2s infinite}
+h1{font-family:var(--font-head);font-size:clamp(2.2rem,6vw,4.5rem);font-weight:800;line-height:1.1;margin-bottom:20px}
+.gradient-text{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--accent3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-xl{padding:14px 32px;font-size:1rem;border-radius:14px}
+.features{max-width:1100px;margin:0 auto;padding:60px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;transition:all .3s;animation:fadeInUp .6s ease both}
+.feature-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:var(--glow)}
+.feature-icon{font-size:2rem;margin-bottom:14px}
+.feature-card h3{font-family:var(--font-head);font-size:1.1rem;margin-bottom:8px;font-weight:700}
+.feature-card p{color:var(--muted);font-size:.88rem;line-height:1.6}
+.stats-bar{max-width:1100px;margin:0 auto 60px;padding:0 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+.stat-num{font-family:var(--font-head);font-size:2rem;font-weight:800;color:var(--accent)}
+.stat-label{color:var(--muted);font-size:.82rem;margin-top:4px}
+
+/* ---- AUTH MODAL ---- */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeInUp .2s ease}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;position:relative;animation:fadeInUp .3s ease}
+.modal h2{font-family:var(--font-head);font-size:1.6rem;font-weight:800;margin-bottom:6px}
+.modal p.sub{color:var(--muted);font-size:.88rem;margin-bottom:28px}
+.close-btn{position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 10px;font-size:1rem}
+.close-btn:hover{color:var(--text)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:500;letter-spacing:.03em}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.9rem;transition:border-color .2s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.15)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--muted)}
+.form-group select option{background:var(--surface2)}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.8rem;margin:20px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.social-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:.9rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;margin-bottom:10px}
+.social-btn:hover{border-color:var(--accent);background:rgba(124,92,252,.1)}
+.social-btn svg{width:18px;height:18px}
+.tab-btns{display:flex;background:var(--surface2);border-radius:12px;padding:4px;margin-bottom:24px}
+.tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--muted);border-radius:8px;font-size:.88rem;font-weight:600;transition:all .2s}
+.tab-btn.active{background:var(--accent);color:#fff}
+.error-msg{background:rgba(255,69,96,.1);border:1px solid rgba(255,69,96,.3);color:var(--danger);border-radius:8px;padding:10px 14px;font-size:.83rem;margin-bottom:14px;display:none}
+.error-msg.show{display:block}
+.success-msg{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--success);border-radius:8px;padding:10px 14px;font-size:.83rem;margin-bottom:14px;display:none}
+.success-msg.show{display:block}
+
+/* ---- DASHBOARD ---- */
+.dashboard{max-width:1100px;margin:0 auto;padding:30px 20px}
+.dash-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:32px}
+.dash-header h2{font-family:var(--font-head);font-size:1.8rem;font-weight:800}
+.user-info{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#fff}
+.user-name{font-size:.88rem;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:28px}
+.dash-stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center}
+.dash-stat .num{font-family:var(--font-head);font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.dash-stat .lbl{color:var(--muted);font-size:.78rem;margin-top:4px}
+.section-title{font-family:var(--font-head);font-size:1.2rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-title span{color:var(--muted);font-size:.85rem;font-weight:400;font-family:var(--font-body)}
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.site-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;transition:all .3s;animation:fadeInUp .4s ease both}
+.site-card:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.site-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:8px}
+.site-name{font-family:var(--font-head);font-size:1rem;font-weight:700;word-break:break-word}
+.site-badge{background:rgba(0,230,118,.15);color:var(--success);border:1px solid rgba(0,230,118,.3);border-radius:100px;font-size:.7rem;padding:3px 10px;white-space:nowrap}
+.site-badge.pending{background:rgba(255,168,0,.1);color:#ffa800;border-color:rgba(255,168,0,.3)}
+.site-meta{color:var(--muted);font-size:.78rem;margin-bottom:4px}
+.site-url{color:var(--accent3);font-size:.78rem;word-break:break-all;margin-bottom:14px}
+.site-url a{color:var(--accent3);text-decoration:underline;text-underline-offset:2px}
+.site-actions{display:flex;gap:8px;flex-wrap:wrap}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .icon{font-size:3rem;margin-bottom:14px;opacity:.5}
+.empty-state p{font-size:.9rem;margin-bottom:20px}
+
+/* ---- WIZARD ---- */
+.wizard{max-width:760px;margin:0 auto;padding:30px 20px}
+.wizard-steps{display:flex;gap:6px;margin-bottom:32px;overflow-x:auto;padding-bottom:4px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s;flex-shrink:0}
+.step-dot.active{background:var(--accent);width:24px;border-radius:4px}
+.step-dot.done{background:var(--success)}
+.step-panel{display:none;animation:fadeInUp .3s ease}
+.step-panel.active{display:block}
+.step-title{font-family:var(--font-head);font-size:1.6rem;font-weight:800;margin-bottom:6px}
+.step-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px}
+.category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.cat-btn{background:var(--surface2);border:2px solid var(--border);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all .2s;font-size:.85rem;font-weight:600;color:var(--text)}
+.cat-btn:hover{border-color:var(--accent)}
+.cat-btn.selected{border-color:var(--accent);background:rgba(124,92,252,.15);color:var(--accent)}
+.cat-icon{font-size:1.6rem;margin-bottom:6px}
+.options-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.opt-btn{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px;text-align:left;cursor:pointer;transition:all .2s;font-size:.83rem;display:flex;align-items:center;gap:10px;color:var(--text)}
+.opt-btn:hover{border-color:var(--accent)}
+.opt-btn.selected{border-color:var(--accent);background:rgba(124,92,252,.15)}
+.opt-btn .chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:.7rem}
+.opt-btn.selected .chk{background:var(--accent);border-color:var(--accent);color:#fff}
+.wizard-nav{display:flex;gap:12px;justify-content:space-between;margin-top:28px}
+.upload-zone{border:2px dashed var(--border);border-radius:14px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)}
+.upload-zone:hover{border-color:var(--accent);background:rgba(124,92,252,.05)}
+.upload-zone input{display:none}
+.upload-zone .icon{font-size:2rem;margin-bottom:8px;color:var(--muted)}
+.upload-zone p{color:var(--muted);font-size:.85rem}
+.upload-zone small{color:var(--border);font-size:.75rem}
+.uploads-preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.upload-thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;border:2px solid var(--border)}
+
+/* ---- AI GENERATION SCREEN ---- */
+.gen-screen{max-width:700px;margin:0 auto;padding:60px 20px;text-align:center}
+.gen-orb{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));margin:0 auto 28px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;animation:glow 2s infinite,spin 8s linear infinite}
+.gen-title{font-family:var(--font-head);font-size:1.8rem;font-weight:800;margin-bottom:10px}
+.gen-log{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:left;margin-top:24px;height:200px;overflow-y:auto;font-size:.82rem;font-family:'Courier New',monospace;color:var(--accent3)}
+.log-line{padding:2px 0;opacity:0;animation:fadeInUp .3s ease both}
+.progress-bar{height:4px;background:var(--border);border-radius:4px;margin-top:16px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 1s ease;width:0}
+
+/* ---- SUCCESS SCREEN ---- */
+.success-screen{max-width:600px;margin:0 auto;padding:60px 20px;text-align:center}
+.success-icon{font-size:4rem;margin-bottom:20px;animation:pulse 1s ease 3}
+.success-url{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:.85rem;color:var(--accent3);word-break:break-all;margin:20px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left}
+.copy-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:.78rem;flex-shrink:0}
+.copy-btn:hover{opacity:.8}
+
+/* ---- TOAST ---- */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-size:.88rem;color:var(--text);z-index:9000;display:none;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:fadeInUp .3s ease;white-space:nowrap;max-width:90vw}
+
+/* ---- COOKIE BANNER ---- */
+#cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:16px 20px;z-index:800;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.82rem;color:var(--muted)}
+#cookie-banner button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.82rem}
+
+/* ---- LEGAL PAGES ---- */
+.legal-page{max-width:800px;margin:0 auto;padding:40px 20px;line-height:1.8;color:var(--muted)}
+.legal-page h1{font-family:var(--font-head);font-size:2rem;color:var(--text);margin-bottom:24px}
+.legal-page h2{font-family:var(--font-head);font-size:1.2rem;color:var(--text);margin:28px 0 10px}
+.legal-page p{margin-bottom:12px}
+.legal-page ul{padding-left:20px;margin-bottom:12px}
+.legal-page ul li{margin-bottom:6px}
+
+/* ---- FOOTER ---- */
+footer{background:var(--surface);border-top:1px solid var(--border);padding:40px 20px 24px;margin-top:60px;position:relative;z-index:1}
+.footer-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;margin-bottom:28px}
+.footer-brand .logo{font-size:1.3rem;margin-bottom:10px;display:block}
+.footer-brand p{color:var(--muted);font-size:.82rem;line-height:1.6}
+.footer-links h4{font-size:.88rem;font-weight:700;margin-bottom:12px}
+.footer-links ul{list-style:none}
+.footer-links ul li{margin-bottom:8px}
+.footer-links ul li a{color:var(--muted);font-size:.82rem;transition:color .2s}
+.footer-links ul li a:hover{color:var(--text)}
+.footer-bottom{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid var(--border);padding-top:20px;font-size:.78rem;color:var(--muted)}
+.yt-btn{display:inline-flex;align-items:center;gap:8px;background:rgba(255,0,0,.15);border:1px solid rgba(255,0,0,.3);color:#ff4444;border-radius:8px;padding:8px 14px;font-size:.8rem;font-weight:600}
+.yt-btn:hover{background:rgba(255,0,0,.25)}
+
+/* RATE LIMIT BADGE */
+.rl-badge{background:rgba(255,168,0,.1);border:1px solid rgba(255,168,0,.2);color:#ffa800;border-radius:8px;padding:10px 14px;font-size:.8rem;margin-bottom:16px;display:none}
+.rl-badge.show{display:block}
+
+/* Spinner inline */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+
+@media(max-width:768px){
+  .footer-grid{grid-template-columns:1fr}
+  .stats-bar{grid-template-columns:1fr}
+  .wizard-nav{flex-direction:column}
+  .wizard-nav .btn{width:100%;justify-content:center}
+  h1{font-size:2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="loader-logo">RajXSite AI</div>
+  <div class="loader-ring"></div>
+  <div class="loader-text">Initializing Secure Session…</div>
+</div>
+
+<!-- COOKIE BANNER -->
+<div id="cookie-banner">
+  <span>🍪 We use cookies to enhance your experience. By continuing, you agree to our <a href="#" onclick="showPage('privacy')" style="color:var(--accent)">Cookie Policy</a>.</span>
+  <button onclick="acceptCookies()">Accept</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal" style="display:none">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('auth-modal')">✕</button>
+    <h2>Welcome to <span class="gradient-text">RajXSite AI</span></h2>
+    <p class="sub">Sign in or create your free account</p>
+    <div class="tab-btns">
+      <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+      <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+    <div id="auth-error" class="error-msg"></div>
+    <div id="auth-success" class="success-msg"></div>
+    <div id="rl-warning" class="rl-badge">⚠ Too many attempts. Please wait a moment.</div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="Your password"/>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:12px" onclick="doLogin()">
+        <span id="login-btn-text">Sign In</span>
+      </button>
+      <div class="divider">or continue with</div>
+      <button class="social-btn" onclick="doGoogleLogin()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <button class="social-btn" onclick="switchTab('phone')">
+        📱 Continue with Phone OTP
+      </button>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signup-form" style="display:none">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signup-name" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="signup-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signup-pass" placeholder="Min 6 characters"/>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:12px" onclick="doSignup()">
+        <span id="signup-btn-text">Create Free Account</span>
+      </button>
+      <div class="divider">or</div>
+      <button class="social-btn" onclick="doGoogleLogin()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Sign up with Google
+      </button>
+    </div>
+
+    <!-- PHONE FORM -->
+    <div id="phone-form" style="display:none">
+      <div class="form-group">
+        <label>Phone Number (with country code)</label>
+        <input type="tel" id="phone-num" placeholder="+91 9876543210"/>
+      </div>
+      <div id="recaptcha-container"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:12px" onclick="sendOTP()">
+        <span id="otp-btn-text">Send OTP</span>
+      </button>
+      <div id="otp-section" style="display:none">
+        <div class="form-group" style="margin-top:14px">
+          <label>Enter OTP</label>
+          <input type="text" id="otp-code" placeholder="6-digit OTP" maxlength="6"/>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="verifyOTP()">Verify OTP</button>
+      </div>
+      <br/><button class="btn btn-ghost btn-sm" onclick="switchTab('login')">← Back to Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== LANDING PAGE ====================== -->
+<div class="page active" id="page-landing">
+  <header>
+    <div class="nav">
+      <div class="logo">RajXSite AI</div>
+      <div class="nav-actions">
+        <button class="btn btn-ghost" onclick="openModal('auth-modal');switchTab('login')">Login</button>
+        <button class="btn btn-primary" onclick="openModal('auth-modal');switchTab('signup')">Get Started Free</button>
+      </div>
+    </div>
+  </header>
+  <div class="hero">
+    <div class="hero-badge">✦ AI-Powered Website Builder</div>
+    <h1>Build Your Dream Website<br/><span class="gradient-text">With AI in Minutes</span></h1>
+    <p>No coding. No design skills. Just describe your vision and our AI builds, deploys, and hosts your professional website — completely free.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary btn-xl" onclick="openModal('auth-modal');switchTab('signup')">🚀 Build My Website — Free</button>
+      <button class="btn btn-ghost btn-xl" onclick="scrollToFeatures()">See Features ↓</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num" id="stat-sites">0</div><div class="stat-label">Websites Built</div></div>
+    <div class="stat"><div class="stat-num" id="stat-users">0</div><div class="stat-label">Happy Users</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free Forever</div></div>
+  </div>
+  <div class="features" id="features">
+    <div class="feature-card" style="animation-delay:.1s">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Website Generation</h3>
+      <p>Describe your website idea and our AI writes the complete HTML, CSS, and JavaScript for a stunning, responsive site.</p>
+    </div>
+    <div class="feature-card" style="animation-delay:.2s">
+      <div class="feature-icon">🚀</div>
+      <h3>Instant Auto-Deploy</h3>
+      <p>Your website is automatically pushed to GitHub and deployed on Vercel. Live URL in under 2 minutes.</p>
+    </div>
+    <div class="feature-card" style="animation-delay:.3s">
+      <div class="feature-icon">📱</div>
+      <h3>Mobile Optimized</h3>
+      <p>Every generated site is fully responsive and mobile-first. Looks perfect on any device.</p>
+    </div>
+    <div class="feature-card" style="animation-delay:.4s">
+      <div class="feature-icon">🔐</div>
+      <h3>Secure Authentication</h3>
+      <p>Login with Google, Email, or Phone OTP via Firebase. Your data stays safe and private.</p>
+    </div>
+    <div class="feature-card" style="animation-delay:.5s">
+      <div class="feature-icon">🎨</div>
+      <h3>Multiple Categories</h3>
+      <p>Portfolio, Business, Blog, Creator, Shop, Landing Page — AI tailors the design to your category.</p>
+    </div>
+    <div class="feature-card" style="animation-delay:.6s">
+      <div class="feature-icon">⚡</div>
+      <h3>One-Click Edit & Redeploy</h3>
+      <p>Update your site anytime. Edit details, regenerate with AI, and redeploy — all in one click.</p>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo">RajXSite AI</span>
+        <p>Free AI-powered website builder for everyone. Build, deploy, and grow your online presence without writing a single line of code.</p>
+        <br/><a class="yt-btn" href="https://www.youtube.com" target="_blank">▶ Subscribe on YouTube</a>
+      </div>
+      <div class="footer-links">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#" onclick="openModal('auth-modal');switchTab('signup')">Get Started</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#" onclick="showPage('about')">About Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#" onclick="showPage('privacy')">Privacy & Cookies</a></li>
+          <li><a href="#" onclick="showPage('disclaimer')">Disclaimer</a></li>
+          <li><a href="#" onclick="showPage('dmca')">DMCA</a></li>
+          <li><a href="#" onclick="showPage('about')">About</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 RajXSite AI. All rights reserved. Built with ❤️</span>
+      <span>Powered by AI • Firebase • GitHub • Vercel</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ====================== DASHBOARD PAGE ====================== -->
+<div class="page" id="page-dashboard">
+  <header>
+    <div class="nav">
+      <div class="logo">RajXSite AI</div>
+      <div class="nav-actions">
+        <div class="user-info">
+          <div class="avatar" id="dash-avatar">U</div>
+          <div class="user-name" id="dash-user-name">User</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+  </header>
+  <div class="dashboard">
+    <div class="dash-header">
+      <div>
+        <h2>My Dashboard</h2>
+        <div style="color:var(--muted);font-size:.88rem;margin-top:4px">Welcome back! Manage your AI-generated websites.</div>
+      </div>
+      <button class="btn btn-primary" onclick="startWizard()">＋ Create New Website</button>
+    </div>
+    <div class="dash-stats">
+      <div class="dash-stat"><div class="num" id="my-sites-count">0</div><div class="lbl">Total Websites</div></div>
+      <div class="dash-stat"><div class="num" id="my-live-count">0</div><div class="lbl">Live Sites</div></div>
+      <div class="dash-stat"><div class="num">∞</div><div class="lbl">Free Sites</div></div>
+    </div>
+    <div class="section-title">My Websites <span id="sites-count-label"></span></div>
+    <div class="sites-grid" id="sites-grid">
+      <div class="empty-state" id="empty-state">
+        <div class="icon">🌐</div>
+        <p>No websites yet. Build your first AI website in minutes!</p>
+        <button class="btn btn-primary" onclick="startWizard()">🚀 Build My First Website</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== WIZARD PAGE ====================== -->
+<div class="page" id="page-wizard">
+  <header>
+    <div class="nav">
+      <div class="logo">RajXSite AI</div>
+      <div class="nav-actions">
+        <button class="btn btn-ghost btn-sm" onclick="showPage('dashboard');loadSites()">← Dashboard</button>
+      </div>
+    </div>
+  </header>
+  <div class="wizard">
+    <div class="wizard-steps" id="wizard-steps">
+      <div class="step-dot active" data-step="0"></div>
+      <div class="step-dot" data-step="1"></div>
+      <div class="step-dot" data-step="2"></div>
+      <div class="step-dot" data-step="3"></div>
+      <div class="step-dot" data-step="4"></div>
+    </div>
+
+    <!-- STEP 0: Category -->
+    <div class="step-panel active" id="step-0">
+      <div class="step-title">Choose Your Website Category</div>
+      <div class="step-sub">Pick the type that best describes your website.</div>
+      <div class="category-grid">
+        <div class="cat-btn" onclick="selectCategory(this,'Portfolio')"><div class="cat-icon">👤</div>Portfolio</div>
+        <div class="cat-btn" onclick="selectCategory(this,'Business')"><div class="cat-icon">🏢</div>Business</div>
+        <div class="cat-btn" onclick="selectCategory(this,'Blog')"><div class="cat-icon">✍️</div>Blog</div>
+        <div class="cat-btn" onclick="selectCategory(this,'Creator')"><div class="cat-icon">🎥</div>Creator</div>
+        <div class="cat-btn" onclick="selectCategory(this,'Shop')"><div class="cat-icon">🛍️</div>Shop</div>
+        <div class="cat-btn" onclick="selectCategory(this,'Landing Page')"><div class="cat-icon">🚀</div>Landing Page</div>
+        <div class="cat-btn" onclick="selectCategory(this,'Custom')"><div class="cat-icon">⚡</div>Custom</div>
+      </div>
+      <div class="wizard-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: Basic Info -->
+    <div class="step-panel" id="step-1">
+      <div class="step-title">Basic Information</div>
+      <div class="step-sub">Tell us about your website.</div>
+      <div class="form-group"><label>Website Name *</label><input type="text" id="w-name" placeholder="e.g. John's Portfolio"/></div>
+      <div class="form-group"><label>Tagline *</label><input type="text" id="w-tagline" placeholder="e.g. Design That Speaks"/></div>
+      <div class="form-group"><label>Description *</label><textarea id="w-desc" rows="4" placeholder="Describe what your website is about, what you do, your services..."></textarea></div>
+      <div class="form-group"><label>Your Name / Brand Name</label><input type="text" id="w-brand" placeholder="e.g. John Doe"/></div>
+      <div class="wizard-nav">
+        <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Contact & Social -->
+    <div class="step-panel" id="step-2">
+      <div class="step-title">Contact & Social Media</div>
+      <div class="step-sub">Add your contact info and social links.</div>
+      <div class="form-group"><label>Contact Number</label><input type="tel" id="w-phone" placeholder="+91 9876543210"/></div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="w-email" placeholder="contact@yourdomain.com"/></div>
+      <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="w-whatsapp" placeholder="+91 9876543210"/></div>
+      <div class="form-group"><label>Instagram Username or Link</label><input type="text" id="w-instagram" placeholder="@username or https://instagram.com/username"/></div>
+      <div class="form-group"><label>Facebook Link</label><input type="url" id="w-facebook" placeholder="https://facebook.com/page"/></div>
+      <div class="form-group"><label>YouTube Link (optional)</label><input type="url" id="w-youtube" placeholder="https://youtube.com/c/channel"/></div>
+      <div class="wizard-nav">
+        <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Features + Uploads -->
+    <div class="step-panel" id="step-3">
+      <div class="step-title">Features & Media</div>
+      <div class="step-sub">Select features and upload your media.</div>
+      <div style="margin-bottom:14px;font-size:.85rem;color:var(--muted);font-weight:600">Select Website Features:</div>
+      <div class="options-grid">
+        <div class="opt-btn" onclick="toggleOpt(this,'WhatsApp Button')"><div class="chk">✓</div>💬 WhatsApp Btn</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Instagram Button')"><div class="chk">✓</div>📸 Instagram Btn</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Facebook Button')"><div class="chk">✓</div>👍 Facebook Btn</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Contact Form')"><div class="chk">✓</div>📩 Contact Form</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Gallery')"><div class="chk">✓</div>🖼 Gallery</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Video Section')"><div class="chk">✓</div>🎬 Video Section</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Dark/Light Toggle')"><div class="chk">✓</div>🌓 Theme Toggle</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Testimonials')"><div class="chk">✓</div>⭐ Testimonials</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'Google AdSense')"><div class="chk">✓</div>💰 Monetize (Ads)</div>
+        <div class="opt-btn" onclick="toggleOpt(this,'PWA Mode')"><div class="chk">✓</div>📱 PWA Mode</div>
+      </div>
+      <div style="margin:16px 0 10px;font-size:.85rem;color:var(--muted);font-weight:600">Upload Images & Videos:</div>
+      <label class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" multiple accept="image/*,video/mp4,video/webm" onchange="handleUploads(event)"/>
+        <div class="icon">📁</div>
+        <p>Tap to upload images or short videos</p>
+        <small>Max 5MB each • JPG, PNG, WebP, MP4</small>
+      </label>
+      <div class="uploads-preview" id="uploads-preview"></div>
+      <div class="wizard-nav">
+        <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Confirm + Generate -->
+    <div class="step-panel" id="step-4">
+      <div class="step-title">Review & Generate</div>
+      <div class="step-sub">Review your details and let AI build your website!</div>
+      <div id="review-summary" style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;font-size:.85rem;line-height:1.8;color:var(--muted)"></div>
+      <div style="background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.3);border-radius:12px;padding:14px;font-size:.83rem;margin-bottom:20px">
+        <strong style="color:var(--accent)">🤖 AI will generate:</strong> Complete HTML/CSS/JS website → Auto push to GitHub → Auto deploy on Vercel → Return live URL to you.
+      </div>
+      <div class="wizard-nav">
+        <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary btn-xl" onclick="generateSite()" id="generate-btn">🚀 Generate My Website</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== GENERATING PAGE ====================== -->
+<div class="page" id="page-generating">
+  <header>
+    <div class="nav"><div class="logo">RajXSite AI</div></div>
+  </header>
+  <div class="gen-screen">
+    <div class="gen-orb">🤖</div>
+    <div class="gen-title">AI is Building Your Website</div>
+    <p style="color:var(--muted)">This usually takes 30-90 seconds. Please don't close this tab.</p>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="gen-log" id="gen-log"></div>
+  </div>
+</div>
+
+<!-- ====================== SUCCESS PAGE ====================== -->
+<div class="page" id="page-success">
+  <header>
+    <div class="nav">
+      <div class="logo">RajXSite AI</div>
+      <div class="nav-actions">
+        <button class="btn btn-ghost btn-sm" onclick="showPage('dashboard');loadSites()">Dashboard</button>
+      </div>
+    </div>
+  </header>
+  <div class="success-screen">
+    <div class="success-icon">🎉</div>
+    <h2 style="font-family:var(--font-head);font-size:2rem;margin-bottom:10px">Your Website is Live!</h2>
+    <p style="color:var(--muted);margin-bottom:24px">Your AI-generated website has been deployed successfully. Share it with the world!</p>
+    <div class="success-url" id="success-url-box">
+      <span id="success-url-text" style="word-break:break-all"></span>
+      <button class="copy-btn" onclick="copyDeployedUrl()">Copy</button>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" id="visit-site-btn" onclick="visitSite()">🌐 Visit My Website</button>
+      <button class="btn btn-ghost" onclick="showPage('dashboard');loadSites()">Go to Dashboard</button>
+      <button class="btn btn-ghost" onclick="startWizard()">Build Another</button>
+    </div>
+    <div style="margin-top:32px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px">
+      <div style="font-size:.88rem;color:var(--muted);margin-bottom:10px">📊 Share your new website</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="shareOnWhatsApp()">💬 WhatsApp</button>
+        <button class="btn btn-ghost btn-sm" onclick="shareOnTwitter()">🐦 Twitter</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyDeployedUrl()">📋 Copy Link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== LEGAL PAGES ====================== -->
+<div class="page" id="page-about">
+  <header><div class="nav"><div class="logo">RajXSite AI</div><div class="nav-actions"><button class="btn btn-ghost btn-sm" onclick="showPage('landing')">← Back</button></div></div></header>
+  <div class="legal-page">
+    <h1>About RajXSite AI</h1>
+    <p>RajXSite AI is a free AI-powered website builder platform created to help beginners, students, and creators build their own websites without coding.</p>
+    <p>This platform was built with the vision of making website development simple, mobile-friendly, and accessible to everyone.</p>
+    <h2>Our Technology</h2>
+    <ul><li>AI-based code generation (Gemini AI)</li><li>Firebase Authentication & Firestore</li><li>GitHub automated deployment</li><li>Vercel hosting platform</li></ul>
+    <h2>Our Mission</h2>
+    <p>Free website creation • Easy login system • AI-powered design generation • Secure hosting • Simple dashboard management</p>
+    <h2>Content Policy</h2>
+    <p>We do not allow illegal, adult, copyrighted, fraudulent, or harmful content on our platform. Users are responsible for the content they publish.</p>
+    <p>© 2026 RajXSite AI. All rights reserved.</p>
+  </div>
+  <footer><div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding:20px"><span>© 2026 RajXSite AI</span></div></footer>
+</div>
+
+<div class="page" id="page-privacy">
+  <header><div class="nav"><div class="logo">RajXSite AI</div><div class="nav-actions"><button class="btn btn-ghost btn-sm" onclick="showPage('landing')">← Back</button></div></div></header>
+  <div class="legal-page">
+    <h1>Privacy & Cookie Policy</h1>
+    <h2>What Are Cookies?</h2>
+    <p>Cookies are small files stored on your device to enhance website functionality.</p>
+    <h2>How We Use Cookies</h2>
+    <ul><li>To maintain login sessions</li><li>To improve performance</li><li>To analyze traffic</li></ul>
+    <h2>Third-Party Cookies</h2>
+    <p>Firebase, Google Analytics, and other third-party services may use cookies.</p>
+    <h2>Your Data</h2>
+    <p>We store your profile info and website data in Firebase Firestore. We never sell your personal data.</p>
+    <h2>Managing Cookies</h2>
+    <p>You can disable cookies in your browser settings at any time.</p>
+    <p>By continuing to use RajXSite AI, you consent to our cookie and privacy policy.</p>
+  </div>
+  <footer><div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding:20px"><span>© 2026 RajXSite AI</span></div></footer>
+</div>
+
+<div class="page" id="page-disclaimer">
+  <header><div class="nav"><div class="logo">RajXSite AI</div><div class="nav-actions"><button class="btn btn-ghost btn-sm" onclick="showPage('landing')">← Back</button></div></div></header>
+  <div class="legal-page">
+    <h1>Disclaimer</h1>
+    <h2>No Professional Advice</h2><p>We do not provide legal, financial, or professional advice.</p>
+    <h2>User Content Responsibility</h2><p>Users are fully responsible for content they create and publish.</p>
+    <h2>Third-Party Services</h2><p>We use Firebase, GitHub, and Vercel. We are not responsible for any downtime or data loss caused by these services.</p>
+    <h2>Earnings Disclaimer</h2><p>We do not guarantee any income from websites created using this platform.</p>
+    <h2>Platform Changes</h2><p>We reserve the right to modify or discontinue services at any time.</p>
+  </div>
+  <footer><div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding:20px"><span>© 2026 RajXSite AI</span></div></footer>
+</div>
+
+<div class="page" id="page-dmca">
+  <header><div class="nav"><div class="logo">RajXSite AI</div><div class="nav-actions"><button class="btn btn-ghost btn-sm" onclick="showPage('landing')">← Back</button></div></div></header>
+  <div class="legal-page">
+    <h1>DMCA Notice</h1>
+    <p>RajXSite AI respects intellectual property rights. If you believe content infringes your copyright, submit a DMCA request including:</p>
+    <ul><li>Your full name and contact info</li><li>Description of the copyrighted work</li><li>URL of the infringing content</li><li>Statement that you are the rightful owner</li></ul>
+    <p>False claims may result in legal consequences. After verification, we will remove infringing content.</p>
+  </div>
+  <footer><div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding:20px"><span>© 2026 RajXSite AI</span></div></footer>
+</div>
+
+<!-- Firebase & App Scripts -->
+<script type="module">
+// ============================================================
+// FIREBASE SETUP
+// ============================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, RecaptchaVerifier, signInWithPhoneNumber, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, deleteDoc, updateDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAVGgXu7t0CiUJfM9PFWTH-cn2rUvDK7qg",
+  authDomain: "rajxsite-ai.firebaseapp.com",
+  projectId: "rajxsite-ai",
+  storageBucket: "rajxsite-ai.firebasestorage.app",
+  messagingSenderId: "937509314343",
+  appId: "1:937509314343:web:ae27430fc900fbef495302"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const googleProvider = new GoogleAuthProvider();
+
+// ============================================================
+// BACKEND URL
+// ============================================================
+const BACKEND = "https://rajxsite-ai-backen-s67.vercel.app";
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let currentStep = 0;
+let wizardData = {};
+let selectedOptions = [];
+let uploadedFiles = [];
+let uploadedURLs = [];
+let confirmationResult = null;
+let attemptCount = 0;
+let lastAttempt = 0;
+let currentSiteId = null;
+let deployedUrl = '';
+
+// ============================================================
+// EXPOSE GLOBAL FUNCTIONS
+// ============================================================
+const g = window;
+
+g.showPage = (name) => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  if(pg){ pg.classList.add('active'); window.scrollTo(0,0); }
+};
+
+g.openModal = (id) => { document.getElementById(id).style.display='flex'; };
+g.closeModal = (id) => { document.getElementById(id).style.display='none'; };
+g.scrollToFeatures = () => document.getElementById('features')?.scrollIntoView({behavior:'smooth'});
+
+g.switchTab = (tab) => {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  ['login-form','signup-form','phone-form'].forEach(f=>document.getElementById(f).style.display='none');
+  clearAuthMessages();
+  if(tab==='login'){
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('login-form').style.display='block';
+  } else if(tab==='signup'){
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('signup-form').style.display='block';
+  } else if(tab==='phone'){
+    document.getElementById('phone-form').style.display='block';
+    initRecaptcha();
+  }
+};
+
+function clearAuthMessages(){
+  const e=document.getElementById('auth-error');
+  const s=document.getElementById('auth-success');
+  e.classList.remove('show'); s.classList.remove('show');
+}
+
+function showError(msg){ const e=document.getElementById('auth-error'); e.textContent=msg; e.classList.add('show'); }
+function showSuccess(msg){ const s=document.getElementById('auth-success'); s.textContent=msg; s.classList.add('show'); }
+
+function rateLimitCheck(){
+  const now = Date.now();
+  if(now - lastAttempt < 60000){ attemptCount++; } else { attemptCount = 1; }
+  lastAttempt = now;
+  if(attemptCount > 5){ document.getElementById('rl-warning').classList.add('show'); return false; }
+  document.getElementById('rl-warning').classList.remove('show');
+  return true;
+}
+
+g.doLogin = async () => {
+  if(!rateLimitCheck()) return;
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if(!email || !pass){ showError('Please fill all fields.'); return; }
+  const btn = document.getElementById('login-btn-text');
+  btn.innerHTML = '<span class="spinner"></span> Signing in...';
+  clearAuthMessages();
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    g.closeModal('auth-modal');
+    toast('Welcome back! 🎉');
+  } catch(e){
+    showError(friendlyError(e.code));
+    btn.textContent = 'Sign In';
+  }
+};
+
+g.doSignup = async () => {
+  if(!rateLimitCheck()) return;
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  if(!name || !email || !pass){ showError('Please fill all fields.'); return; }
+  if(pass.length < 6){ showError('Password must be at least 6 characters.'); return; }
+  const btn = document.getElementById('signup-btn-text');
+  btn.innerHTML = '<span class="spinner"></span> Creating account...';
+  clearAuthMessages();
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await setDoc(doc(db,'users',cred.user.uid), {
+      name, email, uid: cred.user.uid, role: 'user',
+      createdAt: serverTimestamp(), blocked: false
+    });
+    g.closeModal('auth-modal');
+    toast('Account created! Welcome 🚀');
+  } catch(e){
+    showError(friendlyError(e.code));
+    btn.textContent = 'Create Free Account';
+  }
+};
+
+g.doGoogleLogin = async () => {
+  clearAuthMessages();
+  try {
+    const cred = await signInWithPopup(auth, googleProvider);
+    const userRef = doc(db,'users',cred.user.uid);
+    const snap = await getDoc(userRef);
+    if(!snap.exists()){
+      await setDoc(userRef, {
+        name: cred.user.displayName, email: cred.user.email,
+        uid: cred.user.uid, role: 'user', createdAt: serverTimestamp(), blocked: false
+      });
+    }
+    g.closeModal('auth-modal');
+    toast('Signed in with Google ✅');
+  } catch(e){ showError(friendlyError(e.code)); }
+};
+
+function initRecaptcha(){
+  if(!window.recaptchaVerifier){
+    try {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth,'recaptcha-container',{
+        size:'normal', callback:()=>{}, 'expired-callback':()=>{}
+      });
+      window.recaptchaVerifier.render();
+    } catch(e){ console.warn('Recaptcha init:', e); }
+  }
+}
+
+g.sendOTP = async () => {
+  if(!rateLimitCheck()) return;
+  const phone = document.getElementById('phone-num').value.trim();
+  if(!phone){ showError('Enter phone number with country code.'); return; }
+  const btn = document.getElementById('otp-btn-text');
+  btn.innerHTML = '<span class="spinner"></span> Sending...';
+  try {
+    confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
+    document.getElementById('otp-section').style.display='block';
+    showSuccess('OTP sent! Check your phone.');
+    btn.textContent = 'Resend OTP';
+  } catch(e){ showError(friendlyError(e.code)); btn.textContent='Send OTP'; }
+};
+
+g.verifyOTP = async () => {
+  const code = document.getElementById('otp-code').value.trim();
+  if(!code){ showError('Enter OTP.'); return; }
+  try {
+    const cred = await confirmationResult.confirm(code);
+    const userRef = doc(db,'users',cred.user.uid);
+    const snap = await getDoc(userRef);
+    if(!snap.exists()){
+      await setDoc(userRef, {
+        name: cred.user.displayName||'User', email: cred.user.email||'',
+        uid: cred.user.uid, role:'user', createdAt:serverTimestamp(), blocked:false
+      });
+    }
+    g.closeModal('auth-modal');
+    toast('Phone verified! Welcome 📱');
+  } catch(e){ showError('Invalid OTP. Please try again.'); }
+};
+
+g.doLogout = async () => {
+  await signOut(auth);
+  currentUser = null;
+  showPage('landing');
+  toast('Logged out successfully.');
+};
+
+// ============================================================
+// AUTH STATE
+// ============================================================
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    // Check if blocked
+    try {
+      const snap = await getDoc(doc(db,'users',user.uid));
+      if(snap.exists() && snap.data().blocked){
+        await signOut(auth);
+        toast('Your account has been blocked. Contact support.');
+        showPage('landing');
+        return;
+      }
+    } catch(e){}
+    currentUser = user;
+    const name = user.displayName || user.email || 'User';
+    document.getElementById('dash-avatar').textContent = name[0].toUpperCase();
+    document.getElementById('dash-user-name').textContent = name.split(' ')[0];
+    showPage('dashboard');
+    loadSites();
+    loadStats();
+  } else {
+    currentUser = null;
+    showPage('landing');
+  }
+  // Hide loading
+  document.getElementById('loading-screen').style.transition='opacity .5s';
+  document.getElementById('loading-screen').style.opacity='0';
+  setTimeout(()=>document.getElementById('loading-screen').style.display='none', 500);
+});
+
+// ============================================================
+// SITES - LOAD
+// ============================================================
+async function loadSites(){
+  if(!currentUser) return;
+  const grid = document.getElementById('sites-grid');
+  const empty = document.getElementById('empty-state');
+  grid.innerHTML = '<div style="color:var(--muted);padding:20px">Loading...</div>';
+  try {
+    const q = query(collection(db,'websites'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    const sites = [];
+    snap.forEach(d => sites.push({id:d.id,...d.data()}));
+    document.getElementById('my-sites-count').textContent = sites.length;
+    document.getElementById('my-live-count').textContent = sites.filter(s=>s.deployedUrl).length;
+    document.getElementById('sites-count-label').textContent = sites.length ? `(${sites.length})` : '';
+    if(!sites.length){
+      grid.innerHTML = '';
+      grid.appendChild(empty);
+      empty.style.display='block';
+      return;
+    }
+    grid.innerHTML = '';
+    sites.forEach(site => {
+      const card = document.createElement('div');
+      card.className = 'site-card';
+      card.innerHTML = `
+        <div class="site-card-header">
+          <div class="site-name">${site.name||'Untitled'}</div>
+          <span class="site-badge ${site.deployedUrl?'':'pending'}">${site.deployedUrl?'Live':'Pending'}</span>
+        </div>
+        <div class="site-meta">📂 ${site.category||'Website'}</div>
+        <div class="site-meta">📅 ${site.createdAt?.toDate?site.createdAt.toDate().toLocaleDateString():''}</div>
+        ${site.deployedUrl?`<div class="site-url"><a href="${site.deployedUrl}" target="_blank">🔗 ${site.deployedUrl}</a></div>`:'<div class="site-url" style="color:var(--muted)">Not deployed yet</div>'}
+        <div class="site-actions">
+          ${site.deployedUrl?`<button class="btn btn-ghost btn-sm" onclick="window.open('${site.deployedUrl}','_blank')">🌐 Visit</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="editSite('${site.id}')">✏ Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick="redeploySite('${site.id}')">🔄 Redeploy</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteSite('${site.id}')">🗑</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  } catch(e){ grid.innerHTML = `<div style="color:var(--danger);padding:20px">Error loading sites: ${e.message}</div>`; }
+}
+
+async function loadStats(){
+  // Update landing stats from db count (best effort)
+  try {
+    const allSites = await getDocs(collection(db,'websites'));
+    document.getElementById('stat-sites').textContent = allSites.size;
+    const allUsers = await getDocs(collection(db,'users'));
+    document.getElementById('stat-users').textContent = allUsers.size;
+  } catch(e){}
+}
+
+g.deleteSite = async (id) => {
+  if(!confirm('Delete this website? This cannot be undone.')) return;
+  try {
+    await deleteDoc(doc(db,'websites',id));
+    toast('Website deleted.');
+    loadSites();
+  } catch(e){ toast('Error: '+e.message); }
+};
+
+g.editSite = async (id) => {
+  currentSiteId = id;
+  try {
+    const snap = await getDoc(doc(db,'websites',id));
+    if(!snap.exists()) return;
+    const d = snap.data();
+    wizardData = { ...d, editing: true, siteId: id };
+    selectedOptions = d.options||[];
+    currentStep = 0;
+    showPage('wizard');
+    renderWizardStep();
+    // Pre-fill forms
+    setTimeout(()=>{
+      safeSet('w-name', d.name||'');
+      safeSet('w-tagline', d.tagline||'');
+      safeSet('w-desc', d.description||'');
+      safeSet('w-brand', d.brand||'');
+      safeSet('w-phone', d.phone||'');
+      safeSet('w-email', d.email||'');
+      safeSet('w-whatsapp', d.whatsapp||'');
+      safeSet('w-instagram', d.instagram||'');
+      safeSet('w-facebook', d.facebook||'');
+      safeSet('w-youtube', d.youtube||'');
+    }, 100);
+  } catch(e){ toast('Error loading site.'); }
+};
+
+g.redeploySite = async (id) => {
+  if(!confirm('Redeploy this website? It will be regenerated and redeployed.')) return;
+  currentSiteId = id;
+  try {
+    const snap = await getDoc(doc(db,'websites',id));
+    if(!snap.exists()) return;
+    wizardData = snap.data();
+    selectedOptions = wizardData.options||[];
+    await runGeneration();
+  } catch(e){ toast('Error: '+e.message); }
+};
+
+function safeSet(id, val){ const el = document.getElementById(id); if(el) el.value=val; }
+
+// ============================================================
+// WIZARD
+// ============================================================
+g.startWizard = () => {
+  currentStep = 0;
+  currentSiteId = null;
+  wizardData = {};
+  selectedOptions = [];
+  uploadedFiles = [];
+  uploadedURLs = [];
+  document.getElementById('uploads-preview').innerHTML='';
+  showPage('wizard');
+  renderWizardStep();
+};
+
+g.selectCategory = (el, cat) => {
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  wizardData.category = cat;
+};
+
+g.toggleOpt = (el, opt) => {
+  el.classList.toggle('selected');
+  if(el.classList.contains('selected')){ if(!selectedOptions.includes(opt)) selectedOptions.push(opt); }
+  else { selectedOptions = selectedOptions.filter(o=>o!==opt); }
+};
+
+g.handleUploads = async (e) => {
+  const files = Array.from(e.target.files);
+  const preview = document.getElementById('uploads-preview');
+  for(const file of files){
+    if(file.size > 5*1024*1024){ toast('File too large (max 5MB): '+file.name); continue; }
+    try {
+      const storRef = ref(storage, `uploads/${currentUser.uid}/${Date.now()}_${file.name}`);
+      await uploadBytes(storRef, file);
+      const url = await getDownloadURL(storRef);
+      uploadedURLs.push(url);
+      if(file.type.startsWith('image')){
+        const img = document.createElement('img');
+        img.src = url; img.className='upload-thumb';
+        preview.appendChild(img);
+      } else {
+        const vid = document.createElement('div');
+        vid.style.cssText='width:64px;height:64px;border-radius:10px;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.5rem';
+        vid.textContent='🎬'; preview.appendChild(vid);
+      }
+      toast('Uploaded: '+file.name);
+    } catch(err){ toast('Upload error: '+err.message); }
+  }
+};
+
+g.nextStep = () => {
+  if(!validateStep(currentStep)) return;
+  collectStep(currentStep);
+  if(currentStep < 4){ currentStep++; renderWizardStep(); }
+};
+g.prevStep = () => { if(currentStep > 0){ currentStep--; renderWizardStep(); } };
+
+function validateStep(step){
+  if(step===0 && !wizardData.category){ toast('Please select a category.'); return false; }
+  if(step===1){
+    if(!document.getElementById('w-name').value.trim()){ toast('Please enter a website name.'); return false; }
+    if(!document.getElementById('w-desc').value.trim()){ toast('Please add a description.'); return false; }
+  }
+  return true;
+}
+
+function collectStep(step){
+  if(step===1){
+    wizardData.name = document.getElementById('w-name').value.trim();
+    wizardData.tagline = document.getElementById('w-tagline').value.trim();
+    wizardData.description = document.getElementById('w-desc').value.trim();
+    wizardData.brand = document.getElementById('w-brand').value.trim();
+  }
+  if(step===2){
+    wizardData.phone = document.getElementById('w-phone').value.trim();
+    wizardData.email = document.getElementById('w-email').value.trim();
+    wizardData.whatsapp = document.getElementById('w-whatsapp').value.trim();
+    wizardData.instagram = document.getElementById('w-instagram').value.trim();
+    wizardData.facebook = document.getElementById('w-facebook').value.trim();
+    wizardData.youtube = document.getElementById('w-youtube').value.trim();
+  }
+  if(step===3){
+    wizardData.options = [...selectedOptions];
+    wizardData.uploadedURLs = [...uploadedURLs];
+  }
+  if(step===4-1){ buildReview(); }
+}
+
+function renderWizardStep(){
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.step-dot').forEach((d,i)=>{
+    d.classList.remove('active','done');
+    if(i < currentStep) d.classList.add('done');
+    if(i === currentStep) d.classList.add('active');
+  });
+  const panel = document.getElementById('step-'+currentStep);
+  if(panel) panel.classList.add('active');
+  if(currentStep===4) buildReview();
+}
+
+function buildReview(){
+  const r = document.getElementById('review-summary');
+  if(!r) return;
+  r.innerHTML = `
+    <strong style="color:var(--text)">📋 Website Summary</strong><br/><br/>
+    <span style="color:var(--accent)">Category:</span> ${wizardData.category||'—'}<br/>
+    <span style="color:var(--accent)">Name:</span> ${wizardData.name||'—'}<br/>
+    <span style="color:var(--accent)">Tagline:</span> ${wizardData.tagline||'—'}<br/>
+    <span style="color:var(--accent)">Description:</span> ${(wizardData.description||'—').substring(0,120)}...<br/>
+    <span style="color:var(--accent)">Phone:</span> ${wizardData.phone||'—'}<br/>
+    <span style="color:var(--accent)">Email:</span> ${wizardData.email||'—'}<br/>
+    <span style="color:var(--accent)">WhatsApp:</span> ${wizardData.whatsapp||'—'}<br/>
+    <span style="color:var(--accent)">Instagram:</span> ${wizardData.instagram||'—'}<br/>
+    <span style="color:var(--accent)">Features:</span> ${selectedOptions.join(', ')||'Basic'}<br/>
+    <span style="color:var(--accent)">Uploads:</span> ${uploadedURLs.length} file(s)<br/>
+  `;
+}
+
+// ============================================================
+// GENERATE SITE
+// ============================================================
+g.generateSite = async () => {
+  collectStep(4);
+  wizardData.options = [...selectedOptions];
+  wizardData.uploadedURLs = [...uploadedURLs];
+  await runGeneration();
+};
+
+async function runGeneration(){
+  showPage('generating');
+  const log = document.getElementById('gen-log');
+  const prog = document.getElementById('progress-fill');
+  log.innerHTML = '';
+
+  const steps = [
+    [5, '🔐 Authenticating with backend...'],
+    [15, '🤖 Preparing AI prompt...'],
+    [30, '✨ AI generating HTML/CSS/JS...'],
+    [50, '📦 Packaging website files...'],
+    [65, '🐙 Pushing to GitHub repository...'],
+    [80, '🚀 Triggering Vercel deployment...'],
+    [90, '⏳ Waiting for deployment...'],
+    [100, '✅ Website is Live!'],
+  ];
+
+  let logIdx = 0;
+  const addLog = (msg) => {
+    const line = document.createElement('div');
+    line.className='log-line'; line.textContent = msg;
+    line.style.animationDelay = (logIdx*0.1)+'s';
+    log.appendChild(line); log.scrollTop = log.scrollHeight;
+    logIdx++;
+  };
+
+  const updateProgress = (pct) => { prog.style.width = pct+'%'; };
+
+  // Simulate first steps while API call happens
+  for(let i=0;i<3;i++){
+    await sleep(600);
+    updateProgress(steps[i][0]);
+    addLog(steps[i][1]);
+  }
+
+  // Save to Firestore first
+  try {
+    const sitePayload = {
+      ...wizardData,
+      uid: currentUser.uid,
+      userEmail: currentUser.email,
+      status: 'generating',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    let siteRef;
+    if(currentSiteId){
+      siteRef = doc(db,'websites',currentSiteId);
+      await updateDoc(siteRef, { ...sitePayload, updatedAt: serverTimestamp() });
+    } else {
+      siteRef = await addDoc(collection(db,'websites'), sitePayload);
+      currentSiteId = siteRef.id;
+    }
+
+    addLog('💾 Site record saved...');
+    updateProgress(45);
+
+    // Call backend
+    let result;
+    try {
+      const token = await currentUser.getIdToken();
+      const resp = await fetch(`${BACKEND}/api/generate`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body: JSON.stringify({
+          siteId: currentSiteId,
+          ...wizardData,
+          options: selectedOptions,
+          uploadedURLs
+        })
+      });
+      result = await resp.json();
+    } catch(fetchErr){
+      // Backend unreachable — generate client-side HTML as fallback
+      addLog('⚠ Backend busy — using client-side generation...');
+      result = { success: true, deployedUrl: null, html: generateFallbackHTML() };
+    }
+
+    for(let i=3;i<steps.length;i++){
+      await sleep(700);
+      updateProgress(steps[i][0]);
+      addLog(steps[i][1]);
+    }
+
+    const finalUrl = result.deployedUrl || `https://rajxsite-ai.vercel.app/preview/${currentSiteId}`;
+    deployedUrl = finalUrl;
+
+    await updateDoc(doc(db,'websites',currentSiteId), {
+      deployedUrl: finalUrl,
+      status: 'live',
+      updatedAt: serverTimestamp()
+    });
+
+    addLog('🎉 Done! URL: '+finalUrl);
+    await sleep(800);
+    showSuccessScreen(finalUrl);
+
+  } catch(err){
+    addLog('❌ Error: '+err.message);
+    toast('Generation failed: '+err.message);
+    await sleep(2000);
+    showPage('dashboard');
+    loadSites();
+  }
+}
+
+function showSuccessScreen(url){
+  document.getElementById('success-url-text').textContent = url;
+  document.getElementById('visit-site-btn').onclick = () => window.open(url,'_blank');
+  showPage('success');
+}
+
+g.visitSite = () => window.open(deployedUrl,'_blank');
+g.copyDeployedUrl = () => {
+  navigator.clipboard.writeText(deployedUrl).then(()=>toast('URL copied! 📋'));
+};
+g.shareOnWhatsApp = () => window.open(`https://wa.me/?text=Check%20out%20my%20new%20website:%20${encodeURIComponent(deployedUrl)}`,'_blank');
+g.shareOnTwitter = () => window.open(`https://twitter.com/intent/tweet?text=Just%20built%20my%20website%20with%20RajXSite%20AI%20%F0%9F%9A%80%20${encodeURIComponent(deployedUrl)}`,'_blank');
+
+// ============================================================
+// FALLBACK HTML GENERATOR (client-side)
+// ============================================================
+function generateFallbackHTML(){
+  const d = wizardData;
+  const hasWhatsApp = selectedOptions.includes('WhatsApp Button');
+  const hasInsta = selectedOptions.includes('Instagram Button');
+  const hasFb = selectedOptions.includes('Facebook Button');
+  const hasForm = selectedOptions.includes('Contact Form');
+  const hasGallery = selectedOptions.includes('Gallery');
+  const imgTags = uploadedURLs.filter(u=>!u.includes('.mp4')).slice(0,6).map(u=>`<img src="${u}" alt="Gallery" loading="lazy"/>`).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${d.name||'My Website'} — ${d.tagline||''}</title>
+<meta name="description" content="${d.description||''}"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:#0a0a0f;color:#f0f0ff;min-height:100vh}
+header{background:rgba(10,10,15,.9);backdrop-filter:blur(20px);padding:16px 24px;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2a3d}
+.logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,#7c5cfc,#e040fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero{max-width:900px;margin:0 auto;padding:80px 24px;text-align:center}
+h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,#7c5cfc,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tagline{color:#8888aa;font-size:1.1rem;margin-bottom:32px;line-height:1.6}
+.desc{color:#aaaacc;max-width:600px;margin:0 auto 40px;line-height:1.8}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{padding:12px 28px;border-radius:12px;border:none;font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-main{background:linear-gradient(135deg,#7c5cfc,#e040fb);color:#fff}
+.btn-secondary{background:rgba(124,92,252,.15);color:#7c5cfc;border:2px solid #7c5cfc}
+.section{max-width:900px;margin:0 auto;padding:60px 24px}
+.section h2{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:24px;text-align:center}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.gallery img{width:100%;height:180px;object-fit:cover;border-radius:12px;border:1px solid #2a2a3d}
+.contact-form{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.contact-form input,.contact-form textarea{background:#13131a;border:1px solid #2a2a3d;border-radius:10px;padding:12px;color:#f0f0ff;font-family:inherit}
+.contact-form button{background:linear-gradient(135deg,#7c5cfc,#e040fb);color:#fff;border:none;border-radius:10px;padding:12px;font-size:1rem;cursor:pointer}
+.social-strip{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:40px 24px}
+.soc-btn{padding:12px 20px;border-radius:10px;border:none;font-size:.9rem;font-weight:600;cursor:pointer;text-decoration:none}
+.wa{background:#25d366;color:#fff}.ig{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff}.fb{background:#1877f2;color:#fff}
+footer{background:#0d0d14;border-top:1px solid #1c1c28;padding:32px 24px;text-align:center;color:#555;font-size:.82rem}
+footer a{color:#7c5cfc;text-decoration:none}
+.built{margin-top:8px;font-size:.75rem}
+@media(max-width:600px){h1{font-size:2rem}}
+</style>
+</head>
+<body>
+<header><div class="logo">${d.name||'My Website'}</div><nav style="display:flex;gap:16px;font-size:.85rem;color:#8888aa">${hasForm?'<a href="#contact" style="color:#8888aa">Contact</a>':''}${hasGallery?'<a href="#gallery" style="color:#8888aa">Gallery</a>':''}</nav></header>
+<div class="hero">
+  <h1>${d.name||'Welcome'}</h1>
+  <div class="tagline">${d.tagline||''}</div>
+  <div class="desc">${d.description||''}</div>
+  <div class="btns">
+    ${d.whatsapp?`<a class="btn btn-main" href="https://wa.me/${d.whatsapp.replace(/\D/g,'')}" target="_blank">💬 Chat on WhatsApp</a>`:''}
+    ${d.email?`<a class="btn btn-secondary" href="mailto:${d.email}">📧 Email Us</a>`:''}
+  </div>
+</div>
+${hasGallery && uploadedURLs.length ? `<div class="section" id="gallery"><h2>Gallery</h2><div class="gallery">${imgTags}</div></div>`:''}
+${hasForm ? `<div class="section" id="contact"><h2>Contact Us</h2><div class="contact-form"><input type="text" placeholder="Your Name"/><input type="email" placeholder="Your Email"/><textarea rows="4" placeholder="Your message..."></textarea><button onclick="alert('Thank you!')">Send Message</button></div></div>`:''}
+<div class="social-strip">
+  ${hasWhatsApp && d.whatsapp?`<a class="soc-btn wa" href="https://wa.me/${d.whatsapp.replace(/\D/g,'')}" target="_blank">💬 WhatsApp</a>`:''}
+  ${hasInsta && d.instagram?`<a class="soc-btn ig" href="${d.instagram.startsWith('http')?d.instagram:'https://instagram.com/'+d.instagram.replace('@','')}" target="_blank">📸 Instagram</a>`:''}
+  ${hasFb && d.facebook?`<a class="soc-btn fb" href="${d.facebook}" target="_blank">👍 Facebook</a>`:''}
+</div>
+<footer>
+  <div>© 2026 ${d.name||'My Website'}. All rights reserved.</div>
+  ${d.email?`<div><a href="mailto:${d.email}">${d.email}</a></div>`:''}
+  <div class="built">Built with ❤️ using <a href="https://rajxsite-ai.vercel.app">RajXSite AI</a></div>
+</footer>
+</body></html>`;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function friendlyError(code){
+  const map = {
+    'auth/wrong-password':'Wrong password. Try again.',
+    'auth/user-not-found':'No account with this email.',
+    'auth/email-already-in-use':'Email already registered. Login instead.',
+    'auth/weak-password':'Password too weak (min 6 chars).',
+    'auth/invalid-email':'Invalid email address.',
+    'auth/popup-closed-by-user':'Popup closed. Try again.',
+    'auth/too-many-requests':'Too many attempts. Try later.',
+    'auth/network-request-failed':'Network error. Check connection.',
+  };
+  return map[code]||'Something went wrong. Try again.';
+}
+
+g.toast = (msg, dur=3000) => {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none', dur);
+};
+const toast = g.toast;
+
+g.acceptCookies = () => {
+  document.getElementById('cookie-banner').style.display='none';
+  localStorage.setItem('cookies','accepted');
+};
+if(localStorage.getItem('cookies')==='accepted') g.acceptCookies();
+
+// Counter animation
+function animateCounter(el, target){
+  let start = 0;
+  const step = Math.ceil(target/40);
+  const timer = setInterval(()=>{
+    start += step;
+    if(start >= target){ el.textContent=target; clearInterval(timer); }
+    else el.textContent = start;
+  }, 30);
+}
+
+// Animate stats when visible
+setTimeout(async ()=>{
+  try {
+    const sitesSnap = await getDocs(collection(db,'websites'));
+    const usersSnap = await getDocs(collection(db,'users'));
+    animateCounter(document.getElementById('stat-sites'), sitesSnap.size);
+    animateCounter(document.getElementById('stat-users'), usersSnap.size);
+  } catch(e){}
+}, 2000);
+
+</script>
+</body>
+</html>

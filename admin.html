@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RajXSite AI — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#05050a;--surface:#0e0e17;--surface2:#161622;--border:#22223a;--accent:#7c5cfc;--accent2:#e040fb;--accent3:#00e5ff;--text:#f0f0ff;--muted:#7777aa;--danger:#ff4560;--success:#00e676;--warn:#ffa800;--card:#111118;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 0% 0%,rgba(124,92,252,.08) 0%,transparent 50%),radial-gradient(ellipse 50% 40% at 100% 100%,rgba(0,229,255,.06) 0%,transparent 50%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px}
+button{cursor:pointer;font-family:var(--font-body)}
+input,select{font-family:var(--font-body)}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ---- LOGIN SCREEN ---- */
+#admin-login{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px;width:100%;max-width:400px;text-align:center;animation:fadeInUp .4s ease}
+.admin-logo{font-family:var(--font-head);font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.admin-logo small{display:block;font-size:.7rem;color:var(--muted);font-weight:400;font-family:var(--font-body);letter-spacing:.2em;margin-top:2px}
+.login-box h3{font-size:1rem;color:var(--muted);margin-bottom:28px;font-weight:400}
+.field{margin-bottom:14px;text-align:left}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;letter-spacing:.04em;font-weight:500}
+.field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.15)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:10px;font-size:.88rem;font-weight:600;border:none;transition:all .2s;cursor:pointer}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(124,92,252,.3);width:100%;justify-content:center;margin-top:4px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 30px rgba(124,92,252,.5)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+.btn-danger{background:rgba(255,69,96,.15);color:var(--danger);border:1px solid rgba(255,69,96,.3)}
+.btn-danger:hover{background:rgba(255,69,96,.25)}
+.btn-warn{background:rgba(255,168,0,.1);color:var(--warn);border:1px solid rgba(255,168,0,.2)}
+.btn-warn:hover{background:rgba(255,168,0,.2)}
+.btn-sm{padding:6px 12px;font-size:.78rem;border-radius:8px}
+.err{background:rgba(255,69,96,.1);border:1px solid rgba(255,69,96,.3);color:var(--danger);border-radius:8px;padding:9px 14px;font-size:.82rem;margin-bottom:12px;display:none;text-align:left}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+
+/* ---- ADMIN LAYOUT ---- */
+#admin-app{display:none;min-height:100vh;flex-direction:column;position:relative;z-index:1}
+.top-bar{background:rgba(14,14,23,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0}
+.top-logo{font-family:var(--font-head);font-weight:800;font-size:1.2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.top-logo span{font-size:.7rem;color:var(--danger);background:rgba(255,69,96,.15);border:1px solid rgba(255,69,96,.3);border-radius:6px;padding:2px 8px;margin-left:8px;font-family:var(--font-body);font-weight:700;vertical-align:middle;-webkit-text-fill-color:var(--danger)}
+.admin-body{display:flex;flex:1}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;flex-shrink:0;height:calc(100vh - 60px);position:sticky;top:60px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;color:var(--muted);font-size:.88rem;cursor:pointer;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover{color:var(--text);background:rgba(124,92,252,.06)}
+.nav-item.active{color:var(--accent);background:rgba(124,92,252,.1);border-left-color:var(--accent)}
+.nav-item .icon{font-size:1.1rem;width:20px;text-align:center}
+.content{flex:1;padding:28px;overflow-x:hidden}
+.section{display:none;animation:fadeInUp .3s ease}
+.section.active{display:block}
+.section-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.section-head h2{font-family:var(--font-head);font-size:1.5rem;font-weight:800}
+
+/* ---- STATS GRID ---- */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:all .2s}
+.stat-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.stat-card .icon{font-size:1.4rem;margin-bottom:8px}
+.stat-card .num{font-family:var(--font-head);font-size:2rem;font-weight:800}
+.stat-card .lbl{color:var(--muted);font-size:.75rem;margin-top:3px}
+.stat-card.accent .num{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-card.success .num{color:var(--success)}
+.stat-card.warn .num{color:var(--warn)}
+.stat-card.danger .num{color:var(--danger)}
+
+/* ---- TABLES ---- */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th{background:var(--surface2);color:var(--muted);font-size:.75rem;font-weight:600;letter-spacing:.05em;padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;font-size:.83rem;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(124,92,252,.04)}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.7rem;font-weight:600}
+.badge-live{background:rgba(0,230,118,.1);color:var(--success);border:1px solid rgba(0,230,118,.2)}
+.badge-pending{background:rgba(255,168,0,.1);color:var(--warn);border:1px solid rgba(255,168,0,.2)}
+.badge-blocked{background:rgba(255,69,96,.1);color:var(--danger);border:1px solid rgba(255,69,96,.2)}
+.badge-admin{background:rgba(124,92,252,.15);color:var(--accent);border:1px solid rgba(124,92,252,.3)}
+.td-actions{display:flex;gap:6px;flex-wrap:wrap}
+.search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-bar input{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:.88rem;outline:none}
+.search-bar input:focus{border-color:var(--accent)}
+
+/* ---- DETAIL MODAL ---- */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;animation:fadeInUp .3s ease}
+.modal h3{font-family:var(--font-head);font-size:1.3rem;margin-bottom:16px;padding-right:30px}
+.close-m{position:absolute;top:14px;right:14px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 9px;font-size:.9rem}
+.close-m:hover{color:var(--text)}
+.detail-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.83rem;flex-wrap:wrap}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--muted);min-width:110px;flex-shrink:0;font-weight:500}
+.detail-val{color:var(--text);word-break:break-all}
+.detail-val a{color:var(--accent3);text-decoration:underline;text-underline-offset:2px}
+
+/* CHART */
+.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px}
+.chart-wrap h3{font-family:var(--font-head);font-size:1rem;margin-bottom:14px;color:var(--muted)}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:100px}
+.bar{flex:1;background:linear-gradient(to top,var(--accent),var(--accent2));border-radius:6px 6px 0 0;min-height:4px;position:relative;transition:height .5s ease}
+.bar:hover::after{content:attr(data-val);position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--accent3);white-space:nowrap}
+.bar-labels{display:flex;gap:8px;margin-top:6px}
+.bar-label{flex:1;text-align:center;font-size:.65rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:.85rem;z-index:9000;display:none;animation:fadeInUp .2s ease;white-space:nowrap;max-width:90vw}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .content{padding:16px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+.mobile-nav{display:none;background:var(--surface);border-top:1px solid var(--border);padding:8px;position:fixed;bottom:0;left:0;right:0;z-index:100;gap:4px}
+@media(max-width:768px){.mobile-nav{display:flex}}
+.mobile-nav .nav-item{flex:1;flex-direction:column;justify-content:center;padding:8px 4px;font-size:.65rem;gap:3px;border-left:none;border-top:3px solid transparent;border-radius:8px}
+.mobile-nav .nav-item.active{border-top-color:var(--accent);border-left:none}
+</style>
+</head>
+<body>
+
+<!-- ADMIN LOGIN -->
+<div id="admin-login">
+  <div class="login-box">
+    <div class="admin-logo">RajXSite AI <small>ADMIN PANEL</small></div>
+    <h3>Secure Admin Access</h3>
+    <div class="err" id="login-err"></div>
+    <div class="field"><label>ADMIN EMAIL</label><input type="email" id="adm-email" placeholder="admin@rajxsite.com"/></div>
+    <div class="field"><label>PASSWORD</label><input type="password" id="adm-pass" placeholder="Admin password"/></div>
+    <button class="btn btn-primary" onclick="adminLogin()"><span id="adm-btn">Secure Login</span></button>
+    <div style="margin-top:16px;font-size:.75rem;color:var(--muted)">🔐 This panel is restricted to administrators only.</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app" style="display:none;flex-direction:column">
+  <div class="top-bar">
+    <div><span class="top-logo">RajXSite AI <span>ADMIN</span></span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:.8rem;color:var(--muted)" id="adm-name">Admin</span>
+      <button class="btn btn-ghost btn-sm" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <div class="sidebar">
+      <div class="nav-item active" onclick="showSection('overview')" id="nav-overview"><span class="icon">📊</span> Overview</div>
+      <div class="nav-item" onclick="showSection('websites')" id="nav-websites"><span class="icon">🌐</span> All Websites</div>
+      <div class="nav-item" onclick="showSection('users')" id="nav-users"><span class="icon">👥</span> All Users</div>
+      <div class="nav-item" onclick="showSection('analytics')" id="nav-analytics"><span class="icon">📈</span> Analytics</div>
+      <div class="nav-item" onclick="showSection('settings')" id="nav-settings"><span class="icon">⚙️</span> Settings</div>
+    </div>
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <div class="section active" id="sec-overview">
+        <div class="section-head">
+          <h2>Platform Overview</h2>
+          <button class="btn btn-ghost btn-sm" onclick="refreshAll()">🔄 Refresh</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card accent"><div class="icon">🌐</div><div class="num" id="ov-total-sites">—</div><div class="lbl">Total Websites</div></div>
+          <div class="stat-card success"><div class="icon">✅</div><div class="num" id="ov-live-sites">—</div><div class="lbl">Live Websites</div></div>
+          <div class="stat-card accent"><div class="icon">👥</div><div class="num" id="ov-total-users">—</div><div class="lbl">Total Users</div></div>
+          <div class="stat-card danger"><div class="icon">🚫</div><div class="num" id="ov-blocked">—</div><div class="lbl">Blocked Users</div></div>
+          <div class="stat-card warn"><div class="icon">⏳</div><div class="num" id="ov-pending">—</div><div class="lbl">Pending Sites</div></div>
+          <div class="stat-card success"><div class="icon">📅</div><div class="num" id="ov-today">—</div><div class="lbl">Sites Today</div></div>
+        </div>
+        <div class="chart-wrap">
+          <h3>Recent Website Activity (by category)</h3>
+          <div class="bar-chart" id="cat-chart"></div>
+          <div class="bar-labels" id="cat-labels"></div>
+        </div>
+        <div style="font-family:var(--font-head);font-size:1rem;margin-bottom:14px;color:var(--muted)">Recent Websites</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Site Name</th><th>User</th><th>Category</th><th>Status</th><th>Created</th><th>URL</th></tr></thead>
+            <tbody id="recent-sites-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WEBSITES -->
+      <div class="section" id="sec-websites">
+        <div class="section-head">
+          <h2>All Websites</h2>
+          <span id="sites-total-badge" style="color:var(--muted);font-size:.85rem"></span>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="site-search" placeholder="Search by name, category, user…" oninput="filterSites()"/>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Owner UID</th><th>Category</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="all-sites-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="section" id="sec-users">
+        <div class="section-head">
+          <h2>All Users</h2>
+          <span id="users-total-badge" style="color:var(--muted);font-size:.85rem"></span>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="user-search" placeholder="Search by name, email…" oninput="filterUsers()"/>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Sites</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="all-users-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="section" id="sec-analytics">
+        <div class="section-head"><h2>Analytics</h2></div>
+        <div class="stats-grid">
+          <div class="stat-card accent"><div class="icon">📊</div><div class="num" id="an-total">—</div><div class="lbl">Total Sites</div></div>
+          <div class="stat-card success"><div class="icon">🚀</div><div class="num" id="an-live">—</div><div class="lbl">Live</div></div>
+          <div class="stat-card warn"><div class="icon">⏳</div><div class="num" id="an-pending">—</div><div class="lbl">Generating</div></div>
+          <div class="stat-card accent"><div class="icon">👤</div><div class="num" id="an-users">—</div><div class="lbl">Users</div></div>
+        </div>
+        <div class="chart-wrap">
+          <h3>Sites by Category</h3>
+          <div class="bar-chart" id="an-chart"></div>
+          <div class="bar-labels" id="an-labels"></div>
+        </div>
+        <div class="chart-wrap">
+          <h3>Top Users by Site Count</h3>
+          <div class="table-wrap" style="border:none">
+            <table>
+              <thead><tr><th>#</th><th>User Email</th><th>Sites Count</th></tr></thead>
+              <tbody id="top-users-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="section" id="sec-settings">
+        <div class="section-head"><h2>Settings</h2></div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:500px">
+          <div style="font-family:var(--font-head);font-size:1rem;margin-bottom:16px">Platform Configuration</div>
+          <div style="display:flex;flex-direction:column;gap:14px;font-size:.85rem;color:var(--muted)">
+            <div class="detail-row"><span class="detail-label">Backend URL</span><span class="detail-val" style="color:var(--accent3)">https://rajxsite-ai-backen-s67.vercel.app</span></div>
+            <div class="detail-row"><span class="detail-label">Firebase Project</span><span class="detail-val">rajxsite-ai</span></div>
+            <div class="detail-row"><span class="detail-label">Auth Domain</span><span class="detail-val">rajxsite-ai.firebaseapp.com</span></div>
+            <div class="detail-row"><span class="detail-label">AI Model</span><span class="detail-val">Gemini Pro (via backend)</span></div>
+            <div class="detail-row"><span class="detail-label">Deployment</span><span class="detail-val">Vercel (Auto)</span></div>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+            <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Admin Actions</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-ghost btn-sm" onclick="refreshAll()">🔄 Refresh All Data</button>
+              <button class="btn btn-danger btn-sm" onclick="if(confirm('Export all data?')) exportData()">📥 Export Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- mobile bottom nav -->
+  <div class="mobile-nav">
+    <div class="nav-item active" onclick="showSection('overview')" id="mnav-overview"><span class="icon">📊</span>Overview</div>
+    <div class="nav-item" onclick="showSection('websites')" id="mnav-websites"><span class="icon">🌐</span>Sites</div>
+    <div class="nav-item" onclick="showSection('users')" id="mnav-users"><span class="icon">👥</span>Users</div>
+    <div class="nav-item" onclick="showSection('analytics')" id="mnav-analytics"><span class="icon">📈</span>Analytics</div>
+    <div class="nav-item" onclick="showSection('settings')" id="mnav-settings"><span class="icon">⚙️</span>Settings</div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal" style="display:none">
+  <div class="modal">
+    <button class="close-m" onclick="document.getElementById('detail-modal').style.display='none'">✕</button>
+    <h3 id="modal-title">Details</h3>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc, getDoc, query, orderBy, limit, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAVGgXu7t0CiUJfM9PFWTH-cn2rUvDK7qg",
+  authDomain: "rajxsite-ai.firebaseapp.com",
+  projectId: "rajxsite-ai",
+  storageBucket: "rajxsite-ai.firebasestorage.app",
+  messagingSenderId: "937509314343",
+  appId: "1:937509314343:web:ae27430fc900fbef495302"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ADMIN CONFIG — Change these credentials!
+const ADMIN_EMAILS = ['admin@rajxsite.com', 'rajxsite.admin@gmail.com'];
+
+let allSites = [];
+let allUsers = [];
+
+const toast = (msg, dur=3000) => {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none', dur);
+};
+
+window.adminLogin = async () => {
+  const email = document.getElementById('adm-email').value.trim();
+  const pass = document.getElementById('adm-pass').value;
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('adm-btn');
+  err.style.display='none';
+  if(!email || !pass){ err.textContent='Fill all fields.'; err.style.display='block'; return; }
+  btn.innerHTML='<span class="spinner"></span> Verifying...';
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    // Check admin role in Firestore
+    const snap = await getDoc(doc(db,'users',cred.user.uid));
+    const isAdmin = (snap.exists() && snap.data().role==='admin') || ADMIN_EMAILS.includes(email);
+    if(!isAdmin){
+      await signOut(auth);
+      err.textContent='Access denied. Not an admin account.'; err.style.display='block'; btn.textContent='Secure Login'; return;
+    }
+    // Auth success handled by onAuthStateChanged
+  } catch(e){
+    err.textContent = friendlyErr(e.code); err.style.display='block'; btn.textContent='Secure Login';
+  }
+};
+
+window.adminLogout = async () => {
+  await signOut(auth);
+  document.getElementById('admin-app').style.display='none';
+  document.getElementById('admin-login').style.display='flex';
+};
+
+onAuthStateChanged(auth, async user => {
+  if(user){
+    const snap = await getDoc(doc(db,'users',user.uid));
+    const isAdmin = (snap.exists() && snap.data().role==='admin') || ADMIN_EMAILS.includes(user.email);
+    if(!isAdmin){ await signOut(auth); return; }
+    document.getElementById('admin-login').style.display='none';
+    document.getElementById('admin-app').style.display='flex';
+    document.getElementById('adm-name').textContent = user.email;
+    await loadAll();
+  }
+});
+
+async function loadAll(){
+  await Promise.all([loadSites(), loadUsers()]);
+  renderOverview();
+  renderAnalytics();
+}
+
+async function loadSites(){
+  const snap = await getDocs(query(collection(db,'websites'), orderBy('createdAt','desc')));
+  allSites = [];
+  snap.forEach(d=>allSites.push({id:d.id,...d.data()}));
+  renderSitesTable(allSites);
+  document.getElementById('sites-total-badge').textContent = `(${allSites.length} total)`;
+}
+
+async function loadUsers(){
+  const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt','desc')));
+  allUsers = [];
+  snap.forEach(d=>allUsers.push({id:d.id,...d.data()}));
+  // Attach site counts
+  allUsers.forEach(u=>{ u.siteCount = allSites.filter(s=>s.uid===u.uid).length; });
+  renderUsersTable(allUsers);
+  document.getElementById('users-total-badge').textContent = `(${allUsers.length} total)`;
+}
+
+function renderOverview(){
+  const live = allSites.filter(s=>s.deployedUrl).length;
+  const pending = allSites.filter(s=>!s.deployedUrl).length;
+  const blocked = allUsers.filter(u=>u.blocked).length;
+  const today = new Date().toDateString();
+  const todaySites = allSites.filter(s=>{ const d=s.createdAt?.toDate?.(); return d&&d.toDateString()===today; }).length;
+
+  document.getElementById('ov-total-sites').textContent = allSites.length;
+  document.getElementById('ov-live-sites').textContent = live;
+  document.getElementById('ov-total-users').textContent = allUsers.length;
+  document.getElementById('ov-blocked').textContent = blocked;
+  document.getElementById('ov-pending').textContent = pending;
+  document.getElementById('ov-today').textContent = todaySites;
+
+  // Recent 5 sites
+  const tbody = document.getElementById('recent-sites-body');
+  tbody.innerHTML = '';
+  allSites.slice(0,8).forEach(s=>{
+    const tr = document.createElement('tr');
+    const owner = allUsers.find(u=>u.uid===s.uid);
+    tr.innerHTML = `
+      <td><strong>${s.name||'Untitled'}</strong></td>
+      <td style="color:var(--muted);font-size:.78rem">${owner?.email||s.userEmail||s.uid?.slice(0,10)+'...'||'—'}</td>
+      <td>${s.category||'—'}</td>
+      <td><span class="badge ${s.deployedUrl?'badge-live':'badge-pending'}">${s.deployedUrl?'Live':'Pending'}</span></td>
+      <td style="color:var(--muted);font-size:.78rem">${s.createdAt?.toDate?.()?.toLocaleDateString()||'—'}</td>
+      <td>${s.deployedUrl?`<a href="${s.deployedUrl}" target="_blank" style="color:var(--accent3);font-size:.78rem">🔗 Visit</a>`:'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Category chart
+  renderCategoryChart('cat-chart','cat-labels');
+}
+
+function renderCategoryChart(chartId, labelsId){
+  const cats = {};
+  allSites.forEach(s=>{ const c=s.category||'Other'; cats[c]=(cats[c]||0)+1; });
+  const max = Math.max(...Object.values(cats), 1);
+  const chartEl = document.getElementById(chartId);
+  const labelsEl = document.getElementById(labelsId);
+  if(!chartEl) return;
+  chartEl.innerHTML=''; labelsEl.innerHTML='';
+  Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,7).forEach(([cat,count])=>{
+    const bar = document.createElement('div');
+    bar.className='bar'; bar.style.height=(count/max*90)+'%'; bar.dataset.val=count;
+    chartEl.appendChild(bar);
+    const lbl = document.createElement('div');
+    lbl.className='bar-label'; lbl.textContent=cat;
+    labelsEl.appendChild(lbl);
+  });
+}
+
+function renderSitesTable(sites){
+  const tbody = document.getElementById('all-sites-body');
+  tbody.innerHTML = '';
+  sites.forEach(s=>{
+    const owner = allUsers.find(u=>u.uid===s.uid);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${s.name||'Untitled'}</strong><br/><span style="color:var(--muted);font-size:.72rem">${s.tagline||''}</span></td>
+      <td style="font-size:.75rem;color:var(--muted)">${owner?.email||s.userEmail||s.uid?.slice(0,12)+'...'||'—'}</td>
+      <td>${s.category||'—'}</td>
+      <td><span class="badge ${s.deployedUrl?'badge-live':'badge-pending'}">${s.deployedUrl?'Live':'Pending'}</span></td>
+      <td style="color:var(--muted);font-size:.75rem">${s.createdAt?.toDate?.()?.toLocaleDateString()||'—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-ghost btn-sm" onclick="viewSiteDetail('${s.id}')">👁 View</button>
+          ${s.deployedUrl?`<button class="btn btn-ghost btn-sm" onclick="window.open('${s.deployedUrl}','_blank')">🌐</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="adminDeleteSite('${s.id}')">🗑</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderUsersTable(users){
+  const tbody = document.getElementById('all-users-body');
+  tbody.innerHTML='';
+  users.forEach(u=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML=`
+      <td><strong>${u.name||'—'}</strong></td>
+      <td style="font-size:.8rem;color:var(--muted)">${u.email||'—'}</td>
+      <td><span class="badge ${u.role==='admin'?'badge-admin':'badge-pending'}">${u.role||'user'}</span></td>
+      <td style="text-align:center">${u.siteCount||0}</td>
+      <td style="color:var(--muted);font-size:.75rem">${u.createdAt?.toDate?.()?.toLocaleDateString()||'—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-ghost btn-sm" onclick="viewUserDetail('${u.id}')">👁 View</button>
+          <button class="btn ${u.blocked?'btn-warn':'btn-danger'} btn-sm" onclick="toggleBlock('${u.id}','${!u.blocked}')">${u.blocked?'✅ Unblock':'🚫 Block'}</button>
+          ${u.role!=='admin'?`<button class="btn btn-warn btn-sm" onclick="makeAdmin('${u.id}')">👑 Admin</button>`:'<span style="font-size:.75rem;color:var(--accent)">Admin</span>'}
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderAnalytics(){
+  document.getElementById('an-total').textContent = allSites.length;
+  document.getElementById('an-live').textContent = allSites.filter(s=>s.deployedUrl).length;
+  document.getElementById('an-pending').textContent = allSites.filter(s=>!s.deployedUrl).length;
+  document.getElementById('an-users').textContent = allUsers.length;
+  renderCategoryChart('an-chart','an-labels');
+  // Top users
+  const topUsers = [...allUsers].sort((a,b)=>(b.siteCount||0)-(a.siteCount||0)).slice(0,10);
+  const tb = document.getElementById('top-users-body');
+  tb.innerHTML='';
+  topUsers.forEach((u,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${u.email||u.name||'—'}</td><td style="color:var(--accent);font-weight:700">${u.siteCount||0}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+window.filterSites = () => {
+  const q = document.getElementById('site-search').value.toLowerCase();
+  renderSitesTable(allSites.filter(s=>
+    (s.name||'').toLowerCase().includes(q)||
+    (s.category||'').toLowerCase().includes(q)||
+    (s.userEmail||s.uid||'').toLowerCase().includes(q)
+  ));
+};
+
+window.filterUsers = () => {
+  const q = document.getElementById('user-search').value.toLowerCase();
+  renderUsersTable(allUsers.filter(u=>
+    (u.name||'').toLowerCase().includes(q)||
+    (u.email||'').toLowerCase().includes(q)
+  ));
+};
+
+window.viewSiteDetail = async (id) => {
+  const s = allSites.find(x=>x.id===id);
+  if(!s) return;
+  const owner = allUsers.find(u=>u.uid===s.uid);
+  document.getElementById('modal-title').textContent = s.name||'Site Detail';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Site ID</span><span class="detail-val">${s.id}</span></div>
+    <div class="detail-row"><span class="detail-label">Name</span><span class="detail-val">${s.name||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Tagline</span><span class="detail-val">${s.tagline||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Category</span><span class="detail-val">${s.category||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Owner Email</span><span class="detail-val">${owner?.email||s.userEmail||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Description</span><span class="detail-val">${s.description||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">${s.phone||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-val">${s.email||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">WhatsApp</span><span class="detail-val">${s.whatsapp||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Instagram</span><span class="detail-val">${s.instagram||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Features</span><span class="detail-val">${(s.options||[]).join(', ')||'Basic'}</span></div>
+    <div class="detail-row"><span class="detail-label">Status</span><span class="detail-val"><span class="badge ${s.deployedUrl?'badge-live':'badge-pending'}">${s.deployedUrl?'Live':'Pending'}</span></span></div>
+    <div class="detail-row"><span class="detail-label">Live URL</span><span class="detail-val">${s.deployedUrl?`<a href="${s.deployedUrl}" target="_blank">${s.deployedUrl}</a>`:'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Created</span><span class="detail-val">${s.createdAt?.toDate?.()?.toLocaleString()||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Updated</span><span class="detail-val">${s.updatedAt?.toDate?.()?.toLocaleString()||'—'}</span></div>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      ${s.deployedUrl?`<button class="btn btn-ghost btn-sm" onclick="window.open('${s.deployedUrl}','_blank')">🌐 Visit Site</button>`:''}
+      <button class="btn btn-danger btn-sm" onclick="adminDeleteSite('${s.id}');document.getElementById('detail-modal').style.display='none'">🗑 Delete</button>
+    </div>
+  `;
+  document.getElementById('detail-modal').style.display='flex';
+};
+
+window.viewUserDetail = (id) => {
+  const u = allUsers.find(x=>x.id===id);
+  if(!u) return;
+  const userSites = allSites.filter(s=>s.uid===u.uid);
+  document.getElementById('modal-title').textContent = u.name||'User Detail';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="detail-row"><span class="detail-label">UID</span><span class="detail-val">${u.uid||u.id}</span></div>
+    <div class="detail-row"><span class="detail-label">Name</span><span class="detail-val">${u.name||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-val">${u.email||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Role</span><span class="detail-val"><span class="badge ${u.role==='admin'?'badge-admin':'badge-pending'}">${u.role||'user'}</span></span></div>
+    <div class="detail-row"><span class="detail-label">Status</span><span class="detail-val"><span class="badge ${u.blocked?'badge-blocked':'badge-live'}">${u.blocked?'Blocked':'Active'}</span></span></div>
+    <div class="detail-row"><span class="detail-label">Total Sites</span><span class="detail-val">${userSites.length}</span></div>
+    <div class="detail-row"><span class="detail-label">Live Sites</span><span class="detail-val">${userSites.filter(s=>s.deployedUrl).length}</span></div>
+    <div class="detail-row"><span class="detail-label">Joined</span><span class="detail-val">${u.createdAt?.toDate?.()?.toLocaleString()||'—'}</span></div>
+    <div style="margin-top:8px;font-size:.82rem;color:var(--muted)">User's websites:</div>
+    ${userSites.map(s=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:.8rem;display:flex;justify-content:space-between;align-items:center">
+      <span><strong>${s.name||'Untitled'}</strong> <span style="color:var(--muted)">${s.category||''}</span></span>
+      ${s.deployedUrl?`<a href="${s.deployedUrl}" target="_blank" style="color:var(--accent3);font-size:.75rem">🔗</a>`:'<span class="badge badge-pending" style="font-size:.68rem">Pending</span>'}
+    </div>`).join('')}
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn ${u.blocked?'btn-warn':'btn-danger'} btn-sm" onclick="toggleBlock('${u.id}','${!u.blocked}');document.getElementById('detail-modal').style.display='none'">${u.blocked?'✅ Unblock':'🚫 Block'}</button>
+      ${u.role!=='admin'?`<button class="btn btn-warn btn-sm" onclick="makeAdmin('${u.id}');document.getElementById('detail-modal').style.display='none'">👑 Make Admin</button>`:''}
+    </div>
+  `;
+  document.getElementById('detail-modal').style.display='flex';
+};
+
+window.adminDeleteSite = async (id) => {
+  if(!confirm('Permanently delete this website? Cannot be undone.')) return;
+  try {
+    await deleteDoc(doc(db,'websites',id));
+    allSites = allSites.filter(s=>s.id!==id);
+    renderSitesTable(allSites);
+    renderOverview();
+    renderAnalytics();
+    toast('Website deleted permanently.');
+  } catch(e){ toast('Error: '+e.message); }
+};
+
+window.toggleBlock = async (id, blockStr) => {
+  const blocked = blockStr==='true';
+  try {
+    await updateDoc(doc(db,'users',id), { blocked });
+    const u = allUsers.find(x=>x.id===id);
+    if(u) u.blocked = blocked;
+    renderUsersTable(allUsers);
+    renderOverview();
+    toast(blocked ? '🚫 User blocked.' : '✅ User unblocked.');
+  } catch(e){ toast('Error: '+e.message); }
+};
+
+window.makeAdmin = async (id) => {
+  if(!confirm('Make this user an admin? They will have full panel access.')) return;
+  try {
+    await updateDoc(doc(db,'users',id), { role:'admin' });
+    const u = allUsers.find(x=>x.id===id);
+    if(u) u.role='admin';
+    renderUsersTable(allUsers);
+    toast('👑 User is now admin.');
+  } catch(e){ toast('Error: '+e.message); }
+};
+
+window.refreshAll = async () => { toast('Refreshing...'); await loadAll(); toast('Data refreshed ✅'); };
+
+window.exportData = () => {
+  const data = { sites: allSites, users: allUsers, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='rajxsite-data.json'; a.click();
+};
+
+window.showSection = (name) => {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+name)?.classList.add('active');
+  document.getElementById('nav-'+name)?.classList.add('active');
+  document.getElementById('mnav-'+name)?.classList.add('active');
+};
+
+function friendlyErr(code){
+  const m={'auth/wrong-password':'Wrong password.','auth/user-not-found':'Email not found.','auth/too-many-requests':'Too many attempts.'};
+  return m[code]||'Error: '+code;
+}
+</script>
+</body>
+</html>
